@@ -1,6 +1,6 @@
 [submodule "Invio.QueryProvider.Core"]
 	path = Invio.QueryProvider.Core
-	url = git@github.com:invio/Invio.QueryProvider.Core.git
+	url = https://github.com/invio/Invio.QueryProvider.Core.git
 [submodule "Invio.QueryProvider.MySql"]
 	path = Invio.QueryProvider.MySql
-	url = git@github.com:invio/Invio.QueryProvider.MySql.git
+	url = https://github.com/invio/Invio.QueryProvider.MySql.git
