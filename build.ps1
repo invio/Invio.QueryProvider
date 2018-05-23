@@ -24,16 +24,20 @@ exec { & git submodule update --init --recursive }
 if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
 New-Item artifacts -ItemType Directory
 
-exec { & dotnet restore }
-exec { & dotnet build }
+$projects = @(
+    "Invio.QueryProvider.Core\src\Invio.QueryProvider.Core\Invio.QueryProvider.Core.fsproj"
+    "Invio.QueryProvider.Core\test\Invio.QueryProvider.Test\Invio.QueryProvider.Test.fsproj"
+    "Invio.QueryProvider.Core\test\Invio.QueryProvider.Test.CSharp\Invio.QueryProvider.Test.CSharp.csproj"
+    "Invio.QueryProvider.MySql\src\Invio.QueryProvider.MySql\Invio.QueryProvider.MySql.fsproj"
+)
 
-$revision = @{ $true = $env:APPVEYOR_BUILD_NUMBER; $false = 1 }[$env:APPVEYOR_BUILD_NUMBER -ne $NULL];
-$revision = "{0:D4}" -f [convert]::ToInt32($revision, 10)
+$artifacts = Resolve-Path artifacts
+
+foreach ($project in $projects) {
+    exec { & dotnet restore $project }
+    exec { & dotnet build $project }
+    exec { & dotnet pack $project -c Release -o $artifacts }
+}
 
 exec { & dotnet test Invio.QueryProvider.Core\test\Invio.QueryProvider.Test\Invio.QueryProvider.Test.fsproj -c Release }
 exec { & dotnet test Invio.QueryProvider.MySql\test\Invio.QueryProvider.MySql.Test\Invio.QueryProvider.MySql.Test.csproj -c Release }
-
-exec { & dotnet pack Invio.QueryProvider.Core\src\Invio.QueryProvider.Core\Invio.QueryProvider.Core.fsproj -c Release -o ..\..\..\artifacts }
-exec { & dotnet pack Invio.QueryProvider.Core\test\Invio.QueryProvider.Test\Invio.QueryProvider.Test.csproj -c Release -o ..\..\..\artifacts }
-exec { & dotnet pack Invio.QueryProvider.Core\test\Invio.QueryProvider.Test.CSharp\Invio.QueryProvider.Test.CSharp.csproj -c Release -o ..\..\..\artifacts }
-exec { & dotnet pack Invio.QueryProvider.MySql\src\Invio.QueryProvider.MySql\Invio.QueryProvider.MySql.fsproj -c Release -o ..\..\..\artifacts }
