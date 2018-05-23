@@ -40,4 +40,9 @@ foreach ($project in $projects) {
 }
 
 exec { & dotnet test Invio.QueryProvider.Core\test\Invio.QueryProvider.Test\Invio.QueryProvider.Test.fsproj -c Release }
+
+Get-Content ./Invio.QueryProvider.MySql/test/Invio.QueryProvider.MySql.Test/config/appsettings.json.template |
+  ForEach-Object { $_.Replace("<<YOUR_MYSQL_PASSWORD_HERE>>", $env:mysql_password) } > `
+  ./Invio.QueryProvider.MySql/test/Invio.QueryProvider.MySql.Test/config/appsettings.json
+
 exec { & dotnet test Invio.QueryProvider.MySql\test\Invio.QueryProvider.MySql.Test\Invio.QueryProvider.MySql.Test.csproj -c Release }
