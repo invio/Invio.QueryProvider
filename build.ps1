@@ -18,6 +18,9 @@ function Exec
     }
 }
 
+# Clone submodule repos
+exec { & git submodule update --init --recursive }
+
 if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
 New-Item artifacts -ItemType Directory
 
