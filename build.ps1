@@ -19,10 +19,10 @@ function Exec
 }
 
 # Clone submodule repos
-exec { & git submodule update --init --recursive }
+exec { & git submodule update --init --recursive -q }
 
 if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
-New-Item artifacts -ItemType Directory
+[void](New-Item artifacts -ItemType Directory)
 
 $projects = @(
     "Invio.QueryProvider.Core\src\Invio.QueryProvider.Core\Invio.QueryProvider.Core.fsproj"
@@ -31,18 +31,25 @@ $projects = @(
     "Invio.QueryProvider.MySql\src\Invio.QueryProvider.MySql\Invio.QueryProvider.MySql.fsproj"
 )
 
+# The CD environment variable is missing on the windows build server
+$env:PWD = Resolve-Path .
+
 $artifacts = Resolve-Path artifacts
 
 foreach ($project in $projects) {
-    exec { & dotnet restore $project }
-    exec { & dotnet build $project }
+    Write-Information "Building Project '$project'"
     exec { & dotnet pack $project -c Release -o $artifacts }
 }
 
+Write-Information "Running Tests"
+
 exec { & dotnet test Invio.QueryProvider.Core\test\Invio.QueryProvider.Test\Invio.QueryProvider.Test.fsproj -c Release }
 
-Get-Content ./Invio.QueryProvider.MySql/test/Invio.QueryProvider.MySql.Test/config/appsettings.json.template |
-  ForEach-Object { $_.Replace("<<YOUR_MYSQL_PASSWORD_HERE>>", $env:mysql_password) } > `
-  ./Invio.QueryProvider.MySql/test/Invio.QueryProvider.MySql.Test/config/appsettings.json
+$appsettings_path = "./Invio.QueryProvider.MySql/test/Invio.QueryProvider.MySql.Test/config/appsettings.json"
+if (-not (Test-Path $appsettings_path)) {
+  Get-Content "$($appsettings_path).template" |
+    ForEach-Object { $_.Replace("<<YOUR_MYSQL_PASSWORD_HERE>>", $env:mysql_password) } > `
+    $appsettings_path
+}
 
 exec { & dotnet test Invio.QueryProvider.MySql\test\Invio.QueryProvider.MySql.Test\Invio.QueryProvider.MySql.Test.csproj -c Release }

@@ -12,7 +12,7 @@ services:
 environment:
   mysql_password: 'Password12!'
 build_script:
-  - ps: .\build.ps1
+  - ps: '$InformationPreference = [System.Management.Automation.ActionPreference]::Continue; ./build.ps1'
 test: off
 artifacts:
   - path: .\artifacts\**\*.nupkg
