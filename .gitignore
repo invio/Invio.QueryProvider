@@ -166,6 +166,9 @@ $RECYCLE.BIN/
 # NuGet Packages Directory
 packages/
 
+# Coverage reports
+coverage/
+
 # Generated documentation folder
 docs/output/
 

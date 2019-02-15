@@ -1,4 +1,5 @@
-image: Visual Studio 2017
+image:
+  - Ubuntu
 version: '{build}'
 pull_requests:
   do_not_increment_build_number: true
@@ -14,23 +15,19 @@ environment:
   CODECOV_TOKEN:
     secure: /CUdMsHvn37uHup5duyGkVBpdVe/1FNO9/t/s1rM+4pRSly4WNbwPcOs6Lq0KqhG
 before_build:
-  - ps: if (-not (Test-Path .\artifacts)) { mkdir artifacts }
   - git submodule update --init --recursive -q
-  - choco install opencover.portable
-  - choco install codecov
 build_script:
-  - ps: '$InformationPreference = [System.Management.Automation.ActionPreference]::Continue; ./build.ps1'
-before_test:
-  - ps: .\Invio.QueryProvider.MySql\test\Invio.QueryProvider.MySql.Test\configure.ps1
+- sh: ./build.sh
 test_script:
-  - OpenCover.Console.exe -register:user -target:xunit.console.x86.exe "-targetargs:.\Invio.QueryProvider.Core\test\Invio.QueryProvider.Test\bin\Debug\netcoreapp2.0\Invio.QueryProvider.Test.dll" -output:".\Invio.QueryProvider-CodeCov.xml"
-  - OpenCover.Console.exe -register:user -target:xunit.console.x86.exe "-targetargs:.\Invio.QueryProvider.Core\test\Invio.QueryProvider.Test.CSharp\bin\Debug\netcoreapp2.1\Invio.QueryProvider.Test.CSharp.dll" -output:".\Invio.QueryProvider-CodeCov.xml"
-  - OpenCover.Console.exe -register:user -target:xunit.console.x86.exe "-targetargs:.\Invio.QueryProvider.MySql\test\Invio.QueryProvider.MySql.Test\bin\Debug\netcoreapp2.1\Invio.QueryProvider.MySql.Test.dll -noshadow" -output:".\Invio.QueryProvider-CodeCov.xml"
-  - codecov -f ".\Invio.QueryProvider-CodeCov.xml"
+- sh: ./test.sh
+after_test:
+- sh: curl https://codecov.io/bash -o codecov.sh
+- sh: chmod +x ./codecov.sh
+- sh: ./codecov.sh -f ./coverage/coverage.opencover.xml -X gcov -X coveragepy
 artifacts:
-  - path: .\artifacts\**\*.nupkg
+  - path: ./artifacts/**/*.nupkg
     name: NuGet
-  - path: .\Invio.QueryProvider-CodeCov.xml
+  - path: ./coverage/coverage.opencover.xml
     name: Coverage
 deploy:
   - provider: NuGet
