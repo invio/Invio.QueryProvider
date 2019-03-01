@@ -2,7 +2,7 @@
   <Import Condition="Exists('$(SolutionDir)/User.props')" Project="$(SolutionDir)/User.props" />
   <PropertyGroup>
     <QueryProviderVersion>0.1.3</QueryProviderVersion>
-    <MySqlQueryProviderVersion>0.1.3</MySqlQueryProviderVersion>
+    <MySqlQueryProviderVersion>0.1.4</MySqlQueryProviderVersion>
     <UseProjectReferences Condition=" '$(UseProjectReferences)'=='' ">false</UseProjectReferences>
     <UsePrereleasePackages Condition=" '$(UsePrereleasePackages)'=='' ">false</UsePrereleasePackages>
     <QueryProviderCorePath>$(SolutionDir)\Invio.QueryProvider.Core\</QueryProviderCorePath>
