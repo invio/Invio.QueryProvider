@@ -1,7 +1,7 @@
 <Project>
   <Import Condition="Exists('$(SolutionDir)/User.props')" Project="$(SolutionDir)/User.props" />
   <PropertyGroup>
-    <QueryProviderVersion>0.1.3</QueryProviderVersion>
+    <QueryProviderVersion>0.1.4</QueryProviderVersion>
     <MySqlQueryProviderVersion>0.1.4</MySqlQueryProviderVersion>
     <UseProjectReferences Condition=" '$(UseProjectReferences)'=='' ">false</UseProjectReferences>
     <UsePrereleasePackages Condition=" '$(UsePrereleasePackages)'=='' ">false</UsePrereleasePackages>
